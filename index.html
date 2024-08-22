@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <!-- <title>Custom Editor Example</title> -->
+    <title>AceTerus Temporary Question Editor</title>
+    <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous"> -->
+
+    <!-- <!-- The loading of KaTeX is deferred to speed up page rendering --> 
+    <!-- <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/nonmin/jsoneditor.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/npm/@json-editor/json-editor@latest/dist/jsoneditor.min.js"></script> -->
+    <script src="./jsoneditor.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/ace-editor-builds@1.2.4/src-min-noconflict/ace.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.14.0/src-noconflict/ace.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdeliZr.net/gh/pandao/editor.md@1.5.0/editormd.js"></script>
+    <script src="./editormd.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/pandao/editor.md@1.5.0/css/editormd.min.css" />
+</head>
+<body>
+
+<div class="container">
+    <h1>AceTerus Temporary Question Editor</h1>
+    <label for="output-textarea"></label>
+
+    <input  id="file-input" type="file" accept=".json"/>
+    <button class='btn btn-primary' id="import">Import</button>
+    <button class='btn btn-primary' id='down'>Download</button>
+
+    <textarea id='output-textarea' rows="15" style="width: 100%; font-family: monospace;"
+              class='form-control'></textarea>
+
+    <div id='editor_holder'></div>
+</div>
+
+<script>
+	var aceConfig = {
+	  mode: 'ace/mode/json',
+      readOnly: true,
+	  maxLines: Infinity,
+	  minLines: 5,
+	  showFoldWidgets: false,
+	  showPrintMargin: false
+	}
+    var setValue = document.querySelector('#setvalue')
+    var outputTextarea = ace.edit('output-textarea', aceConfig)
+    // document.getElementById('import').onclick = function() {
+    //     var files = document.getElementById('selectFiles').files;
+    //   console.log(files);
+    //   if (files.length <= 0) {
+    //     return false;
+    //   }
+
+    //   var fr = new FileReader();
+
+    //   fr.onload = function(e) { 
+    //   console.log(e);
+    //     var result = JSON.parse(e.target.result);
+    //     var formatted = JSON.stringify(result, null, 2);
+    //         document.getElementById('result').value = formatted;
+    //   }
+
+    //   fr.readAsText(files.item(0));
+    // };
+  // Initialize the editor with a JSON schema
+
+  // Hook up the submit button to log to the console
+  // document.getElementById('submit').addEventListener('click',function() {
+  //   // Get the value from the editor
+  //   console.log(editor.getValue());
+  // });
+
+  /* --------------------------------------------- create custom editor class */
+
+class EditormdEditor extends JSONEditor.AbstractEditor {
+
+    applyConstFilter (value) {
+      if (this.enforceConstEnabled && typeof this.schema.const !== 'undefined') {
+        value = this.schema.const
+      }
+
+      return value
+    }
+
+    setValue (value, initial, fromTemplate) {
+        // value = this.applyConstFilter(value)
+        // var res = _get(_getPrototypeOf(EditormdEditor.prototype), "setValue", this).call(this, value, initial, fromTemplate);
+        // const res = super.setValue(value)
+        // console.log(value)
+
+        if (value !== undefined && this.editormd_instance && this.editormd_instance.cm && this.editormd_instance.editor){
+            this.editormd_instance.setMarkdown(value)
+            alert(this.editormd_instance.getMarkdown())
+            // this.editormd_instance.editor.remove();
+            return
+            // this.editormd_instance.editor.asetValue(value);
+        }
+
+
+    }
+
+
+    build () {
+        this.input = document.createElement('div')
+		this.options.format = 'textarea' /* Force format into "textarea" */
+		super.build()
+		this.input_type = this.schema.format /* Restore original format */
+		this.input.setAttribute('data-schemaformat', "markdown")
+		this.input.id = Date.now()
+        console.log(this.input.id)
+	    this.container.appendChild(this.input)
+    }
+
+
+    postBuild () {
+        super.postBuild()
+        if (window.editormd) {
+            let options = {
+                height: 300,
+                path: "https://cdn.jsdelivr.net/gh/pandao/editor.md@1.5.0/lib/",
+                tex: true,
+            }
+
+        this.editormd_instance = new window.editormd(this.input.id, options)
+        // this.editormd_instance.setMarkdown("ded")
+
+        window.editormd.katexURL = {
+            js  : "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min",  // default: //cdnjs.cloudflare.com/ajax/libs/KaTeX/0.3.0/katex.min
+            css : "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min"   // default: //cdnjs.cloudflare.com/ajax/libs/KaTeX/0.3.0/katex.min
+        };
+
+        if (this.schema.readOnly || this.schema.readonly || this.schema.template) {
+            this.editormd_instance.config("readOnly", true)
+        }
+
+        this.editormd_instance.on('change', () => {
+
+            this.value = this.editormd_instance.getMarkdown()
+            console.log(this.editormd_instance.id, this.editormd_instance.getMarkdown())
+            this.is_dirty = true
+            this.onChange(true)
+        })
+
+      /* This will prevent SimpleMDE content from being hidden until focus in Chrome */
+      /* if SimpleMDE is not visible (Like when placed inside Tabs) */
+      // if (options.autorefresh) {
+      //   this.startListening(this.editormd_instance.codemirror, this.editormd_instance.codemirror.state.autoRefresh = { delay: 250 })
+      // }
+
+
+        this.theme.afterInputReady(this.input)
+        } else super.afterInputReady() /* Library not loaded, so just treat this as a string */
+
+    }
+
+
+    getNumColumns () {
+        return 6
+    }
+
+    enable () {
+        // alert("end")
+        // if (!this.always_disabled && this.editormd_instance) this.editormd_instance.config("readOnly", false)
+        // super.enable()
+    }
+
+    disable (alwaysDisabled) {
+        if (this.editormd_instance) this.editormd_instance.config("readOnly", true)
+        super.disable(alwaysDisabled)
+    }
+
+    destroy () {
+        if (this.editormd_instance) {
+            this.editormd_instance.editor.remove();
+            this.editormd_instance = null
+        }
+        super.destroy()
+    }
+}
+
+    JSONEditor.defaults.editors.editormdEditor = EditormdEditor
+
+    JSONEditor.defaults.resolvers.unshift(function (schema) {
+        if (schema.type === 'string' && schema.format === 'editormd') {
+            return 'editormdEditor'
+        }
+    })
+
+    var editor = new JSONEditor(document.getElementById('editor_holder'),{
+        theme: 'spectre',
+        iconlib: 'spectre',
+        schema: {
+            "title": "Question",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "question_no": {
+                        "type": "string"
+                    },
+                    "question_text": {
+                        "type": "string",
+                        "format": "editormd"
+                    },
+                    "multiple_answers": {
+                        "type": "object",
+                        "properties": {
+                            "multiple_answers_choices": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string",
+                                    "format": "editormd"
+                                }
+                            },
+                            "multiple_answers_answers": {
+                                "type": "array",
+                                "items": {
+                                    "type": "integer"
+                                }
+                            },
+                            "is_multiple_choices_ordered": {
+                                "type": "boolean"
+                            }
+                        }
+                    },
+                    "choices": {
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "editormd"
+                        }
+                    },
+                    "answer": {
+                        "type": "integer"
+                    },
+                    "is_choices_ordered": {
+                        "type": "boolean"
+                    },
+                    "solution": {
+                        "type": "object",
+                        "properties": {
+                            "explanation": {
+                                "type": "string",
+                                "format": "editormd"
+                            },
+                            "chapters": {
+                                "type": "array",
+                                "items": {
+                                    "type": "string"
+                                }
+                            },
+                            "pages": {
+                                "type": "object",
+                                "properties": {
+                                    "form4": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "form5": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    },
+                                    "form3": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "tags": {
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "state": {
+                        "type": "string"
+                    },
+                    "subject": {
+                        "type": "integer"
+                    }
+                }
+                // "required": [
+                //     "question_no",
+                //     "question_text",
+                //     "is_choices_ordered"
+                // ]
+            }
+        }
+    });
+    
+    var json = ''
+
+    editor.on('change', function () {
+        json = editor.getValue()
+        outputTextarea.setValue(JSON.stringify(json, null, 2))
+        outputTextarea.clearSelection(1)
+    })
+
+   function saveTextAsFile(textToWrite, fileNameToSaveAs)
+    {
+    	var textFileAsBlob = new Blob([textToWrite], {type:'text/plain'}); 
+    	var downloadLink = document.createElement("a");
+    	downloadLink.download = fileNameToSaveAs;
+    	downloadLink.innerHTML = "Download File";
+    	if (window.webkitURL != null)
+    	{
+    		// Chrome allows the link to be clicked
+    		// without actually adding it to the DOM.
+    		downloadLink.href = window.webkitURL.createObjectURL(textFileAsBlob);
+    	}
+    	else
+    	{
+    		// Firefox requires the link to be added to the DOM
+    		// before it can be clicked.
+    		downloadLink.href = window.URL.createObjectURL(textFileAsBlob);
+    		downloadLink.onclick = destroyClickedElement;
+    		downloadLink.style.display = "none";
+    		document.body.appendChild(downloadLink);
+    	}
+    
+    	downloadLink.click();
+    }
+
+    $('#down').click(function(){
+        saveTextAsFile(JSON.stringify(json, null, 2), "new.json")
+     this.href = "data:text/plain;charset=UTF-8,"  + encodeURIComponent(json);
+    });
+
+    var file = document.getElementById("file-input").files[0];
+
+    document.getElementById('import').onclick = function() {
+        var files = document.getElementById('file-input').files;
+      console.log(files);
+      if (files.length <= 0) {
+        return false;
+      }
+
+      var fr = new FileReader();
+
+      fr.onload = function(e) { 
+        var result = JSON.parse(e.target.result);
+        var formatted = JSON.stringify(result, null, 2);
+        outputTextarea.setValue(formatted)
+        editor.setValue(result)
+        outputTextarea.setValue(formatted)
+        editor.setValue(result)
+      }
+
+     document.getElementById('import').style = "display: none;"
+
+      fr.readAsText(files.item(0));
+    };
+
+    // function outputFileContents(file: File) {
+    //   const reader = new FileReader();
+    //   reader.readAsText(file);
+    //   // reader.addEventListener('load', () =>  );
+    // }
+
+    // input.addEventListener('change', () => outputFileContents(input.files[0]));
+
+  // editor.on('change', function () {
+  //   document.querySelector('#value').textContent = JSON.stringify(editor.getValue(), null, 2)
+  // })
+
+</script>
+</body>
+</html>
