@@ -16,8 +16,8 @@
     <!-- <script src="https://cdn.jsdelivr.net/npm/ace-editor-builds@1.2.4/src-min-noconflict/ace.js"></script> -->
     <script src="https://cdn.jsdelivr.net/npm/ace-builds@1.14.0/src-noconflict/ace.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/pandao/editor.md@1.5.0/editormd.js"></script>
-    <!-- <script src="./editormd.js"></script> -->
+    <!-- <script src="https://cdn.jsdelivr.net/gh/pandao/editor.md@1.5.0/editormd.js"></script> -->
+    <script src="./editormd.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css" />
     <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre-icons.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/pandao/editor.md@1.5.0/css/editormd.min.css" />
@@ -95,7 +95,7 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
 
         if (value !== undefined && this.editormd_instance && this.editormd_instance.cm && this.editormd_instance.editor){
             this.editormd_instance.setMarkdown(value)
-            alert(this.editormd_instance.getMarkdown())
+            // alert(this.editormd_instance.getMarkdown())
             // this.editormd_instance.editor.remove();
             return
             // this.editormd_instance.editor.asetValue(value);
@@ -112,22 +112,45 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
 		this.input_type = this.schema.format /* Restore original format */
 		this.input.setAttribute('data-schemaformat', "markdown")
 		this.input.id = Date.now()
-        console.log(this.input.id)
+        // const mydiv = document.createElement('div')
+        // mydiv.id = this.input.id * 2
+        // mydiv.style = "display: none;"
+        // console.log(this.input.id)
 	    this.container.appendChild(this.input)
+	    // this.container.appendChild(mydiv)
     }
 
 
     postBuild () {
         super.postBuild()
+        // var rid = this.input.id * 2;
+        let self = this
+        // console.log(this.input.id, rid)
         if (window.editormd) {
             let options = {
                 height: 300,
                 path: "https://cdn.jsdelivr.net/gh/pandao/editor.md@1.5.0/lib/",
                 tex: true,
+                onchange: function(){
+                    self.value = this.getMarkdown()
+                    // console.log(this.getMarkdown())
+                    // $("#" + self.input.id).html(this.getValue())
+                    console.log($("#" + self.input.id).innerHTML)
+                    self.is_dirty = true
+                    self.onChange(true)
+                },
+                autoFocus: false
             }
 
         this.editormd_instance = new window.editormd(this.input.id, options)
         // this.editormd_instance.setMarkdown("ded")
+
+        // this.editormd_instance.config("onchange", function(){
+        //                 // super.value = this.getMarkdown()
+        //                 console.log(this.getMarkdown())
+        //                 // super.is_dirty = true
+        //                 // super.onChange(true)
+        //             })
 
         window.editormd.katexURL = {
             js  : "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min",  // default: //cdnjs.cloudflare.com/ajax/libs/KaTeX/0.3.0/katex.min
@@ -138,13 +161,19 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
             this.editormd_instance.config("readOnly", true)
         }
 
-        this.editormd_instance.on('change', () => {
+        // this.editormd_instance.config("onchange", function(){
+        //                 console.log(this.getMarkdown())
+        // })
 
-            this.value = this.editormd_instance.getMarkdown()
-            console.log(this.editormd_instance.id, this.editormd_instance.getMarkdown())
-            this.is_dirty = true
-            this.onChange(true)
-        })
+        // this.editormd_instance.addEventListener('change', () => {
+        //     this.value = this.editormd_instance.getMarkdown()
+        //     console.log(this.editormd_instance.id, this.editormd_instance.getMarkdown())
+        //     this.is_dirty = true
+        //     this.onChange(true)
+        // })
+    // uploadButton.addEventListener('click', () => {
+    //   this.uploader.click()
+    // })
 
       /* This will prevent SimpleMDE content from being hidden until focus in Chrome */
       /* if SimpleMDE is not visible (Like when placed inside Tabs) */
@@ -164,6 +193,7 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
     }
 
     enable () {
+        console.log(this.input.id)
         // alert("end")
         // if (!this.always_disabled && this.editormd_instance) this.editormd_instance.config("readOnly", false)
         // super.enable()
