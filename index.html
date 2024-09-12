@@ -29,13 +29,14 @@
     <label for="output-textarea"></label>
 
     <input  id="file-input" type="file" accept=".json"/>
-    <button class='btn btn-primary' id="import">Import</button>
-    <button class='btn btn-primary' id='down'>Download</button>
+            <button class='btn btn-primary' id="import">Import</button> <span id="hahahad">&emsp; or &emsp;</span>
+    <button class='btn btn-primary' id='newins'>New</button>
+    <button class='btn btn-primary' id='down' style='display: none;'>Download</button>
 
     <textarea id='output-textarea' rows="15" style="width: 100%; font-family: monospace;"
               class='form-control'></textarea>
 
-    <div id='editor_holder'></div>
+    <div id='editor_holder' style='display: none;'></div>
 </div>
 
 <script>
@@ -76,66 +77,132 @@
   // });
 
   /* --------------------------------------------- create custom editor class */
+var imported = false
 
 class EditormdEditor extends JSONEditor.AbstractEditor {
-
-    applyConstFilter (value) {
-      if (this.enforceConstEnabled && typeof this.schema.const !== 'undefined') {
-        value = this.schema.const
-      }
-
-      return value
-    }
-
-    setValue (value, initial, fromTemplate) {
-        // value = this.applyConstFilter(value)
-        // var res = _get(_getPrototypeOf(EditormdEditor.prototype), "setValue", this).call(this, value, initial, fromTemplate);
-        // const res = super.setValue(value)
-        // console.log(value)
-
-        if (value !== undefined && this.editormd_instance && this.editormd_instance.cm && this.editormd_instance.editor){
-            this.editormd_instance.setMarkdown(value)
-            // alert(this.editormd_instance.getMarkdown())
-            // this.editormd_instance.editor.remove();
-            return
-            // this.editormd_instance.editor.asetValue(value);
-        }
+        // constructor (options, defaults) {
+        //     super(options, defaults);
+        //     // super(defaults);
+        //     // this.alrset = false;
+        // }
 
 
-    }
+
+    // applyConstFilter (value) {
+    //   if (this.enforceConstEnabled && typeof this.schema.const !== 'undefined') {
+    //     value = this.schema.const
+    //   }
+
+    //   return value
+    // }
+
+    // isetValue (value, initial, fromTemplate) {
+    //     // value = this.applyConstFilter(value)
+    //     // var res = _get(_getPrototypeOf(EditormdEditor.prototype), "setValue", this).call(this, value, initial, fromTemplate);
+    //     // const res = super.setValue(value)
+    //     // console.log(value)
+
+    //     // if (value !== undefined && this.editormd_instance && this.editormd_instance.cm && this.editormd_instance.editor){
+    //     //     this.editormd_instance.setMarkdown(value)
+    //     //     // alert(this.editormd_instance.getMarkdown())
+    //     //     // this.editormd_instance.editor.remove();
+    //     //     return
+    //     //     // this.editormd_instance.editor.asetValue(value);
+    //     // }
+    //     // return
+
+    //     if(value == undefined) return
+
+    //     // console.log(value)
+
+    //     return
+    //         
+
+    //     let options = {
+    //         height: 300,
+    //         path: "https://cdn.jsdelivr.net/gh/pandao/editor.md@1.5.0/lib/",
+    //         tex: true,
+    //         markdown: value,
+    //         onchange: function(){
+    //             self.value = this.getMarkdown()
+    //             // console.log(this.getMarkdown())
+    //             // $("#" + self.input.id).html(this.getValue())
+    //             //console.log($("#" + self.input.id).innerHTML)
+    //             self.is_dirty = true
+    //             // self.onChange(true)
+    //         },
+    //         autoFocus: false
+    //     }
+
+
+    //     if (this.editormd_instance) {
+
+    //         // self.onChange(false)
+    //         this.editormd_instance.editor.remove();
+
+    //         this.input = document.createElement('div')
+    //         this.options.format = 'textarea' /* Force format into "textarea" */
+    //         // super.build()
+    //         // this.input_type = this.schema.format /* Restore original format */
+    //         // this.input.setAttribute('data-schemaformat', "markdown")
+    //         this.input.id = Date.now()
+    //         // const mydiv = document.createElement('div')
+    //         // mydiv.id = this.input.id * 2
+    //         // mydiv.style = "display: none;"
+    //         // console.log(this.input.id)
+    //         this.container.appendChild(this.input)
+    //         this.editormd_instance = new window.editormd(this.input.id, options)
+    //         window.editormd.katexURL = {
+    //             js  : "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min",  // default: //cdnjs.cloudflare.com/ajax/libs/KaTeX/0.3.0/katex.min
+    //             css : "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min"   // default: //cdnjs.cloudflare.com/ajax/libs/KaTeX/0.3.0/katex.min
+    //         };
+    //     }
+
+
+
+    // }
 
 
     build () {
+        super.build()
+    }
+
+
+    // postBuild () {
+    //     accbuild("")
+    // }
+
+    // this.alrset = false;
+
+    accbuild (heh) {
+
+        // console.log(heh)
         this.input = document.createElement('div')
 		this.options.format = 'textarea' /* Force format into "textarea" */
-		super.build()
+		// super.build()
 		this.input_type = this.schema.format /* Restore original format */
 		this.input.setAttribute('data-schemaformat', "markdown")
 		this.input.id = Date.now()
         // const mydiv = document.createElement('div')
         // mydiv.id = this.input.id * 2
         // mydiv.style = "display: none;"
-        // console.log(this.input.id)
 	    this.container.appendChild(this.input)
 	    // this.container.appendChild(mydiv)
-    }
-
-
-    postBuild () {
-        super.postBuild()
+        // super.postBuild()
         // var rid = this.input.id * 2;
         let self = this
         // console.log(this.input.id, rid)
-        if (window.editormd) {
+        // if (window.editormd) {
             let options = {
                 height: 300,
                 path: "https://cdn.jsdelivr.net/gh/pandao/editor.md@1.5.0/lib/",
                 tex: true,
+                markdown: heh,
                 onchange: function(){
                     self.value = this.getMarkdown()
                     // console.log(this.getMarkdown())
                     // $("#" + self.input.id).html(this.getValue())
-                    console.log($("#" + self.input.id).innerHTML)
+                    // console.log($("#" + self.input.id).innerHTML)
                     self.is_dirty = true
                     self.onChange(true)
                 },
@@ -161,39 +228,18 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
             this.editormd_instance.config("readOnly", true)
         }
 
-        // this.editormd_instance.config("onchange", function(){
-        //                 console.log(this.getMarkdown())
-        // })
-
-        // this.editormd_instance.addEventListener('change', () => {
-        //     this.value = this.editormd_instance.getMarkdown()
-        //     console.log(this.editormd_instance.id, this.editormd_instance.getMarkdown())
-        //     this.is_dirty = true
-        //     this.onChange(true)
-        // })
-    // uploadButton.addEventListener('click', () => {
-    //   this.uploader.click()
-    // })
-
-      /* This will prevent SimpleMDE content from being hidden until focus in Chrome */
-      /* if SimpleMDE is not visible (Like when placed inside Tabs) */
-      // if (options.autorefresh) {
-      //   this.startListening(this.editormd_instance.codemirror, this.editormd_instance.codemirror.state.autoRefresh = { delay: 250 })
-      // }
-
-
-        this.theme.afterInputReady(this.input)
-        } else super.afterInputReady() /* Library not loaded, so just treat this as a string */
+        // this.theme.afterInputReady(this.input)
+        // } else super.afterInputReady() /* Library not loaded, so just treat this as a string */
 
     }
-
 
     getNumColumns () {
         return 6
     }
 
     enable () {
-        console.log(this.input.id)
+        // console.log(this.input.id)
+        // console.log(this.input.id)
         // alert("end")
         // if (!this.always_disabled && this.editormd_instance) this.editormd_instance.config("readOnly", false)
         // super.enable()
@@ -211,7 +257,31 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
         }
         super.destroy()
     }
+
+    postBuild(){
+        // super.postBuild()
+        // this.accbuild("")
+    }
+
+    setValue(value, initial, fromTemplate){
+        if(initial == true && imported == true)return
+        // console.log(value, initial, fromTemplate)
+        // if(this.alrset == false){
+            // this.alrset = true
+        this.accbuild(value)
+            // return
+        // }
+        if(value == undefined)return
+        // console.log(value)
+
+        // super.postBuild()
+        // this.destroy
+        // this.alrset = true
+
+    }
 }
+
+    // EditormdEditor.alrset = false;
 
     JSONEditor.defaults.editors.editormdEditor = EditormdEditor
 
@@ -333,11 +403,6 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
     
     var json = ''
 
-    editor.on('change', function () {
-        json = editor.getValue()
-        outputTextarea.setValue(JSON.stringify(json, null, 2))
-        outputTextarea.clearSelection(1)
-    })
 
    function saveTextAsFile(textToWrite, fileNameToSaveAs)
     {
@@ -365,29 +430,73 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
     }
 
     $('#down').click(function(){
+        json = editor.getValue()
+        outputTextarea.setValue(JSON.stringify(json, null, 2))
+        outputTextarea.clearSelection(1)
         saveTextAsFile(JSON.stringify(json, null, 2), "new.json")
      this.href = "data:text/plain;charset=UTF-8,"  + encodeURIComponent(json);
     });
 
     var file = document.getElementById("file-input").files[0];
 
+    document.getElementById('newins').onclick = function() {
+        document.getElementById('editor_holder').style = "display: block;"
+        document.getElementById('down').style = "display: inline-block;"
+        document.getElementById('import').style = "display: none;"
+        document.getElementById('file-input').style = "display: none;"
+        document.getElementById('newins').style = "display: none;"
+        document.getElementById('hahahad').style = "display: none;"
+
+        editor.on('change', function () {
+            json = editor.getValue()
+            outputTextarea.setValue(JSON.stringify(json, null, 2))
+            outputTextarea.clearSelection(1)
+        })
+    }
+    // document.getElementById('import').onclick = function() {
+    // }
+
     document.getElementById('import').onclick = function() {
+
+        document.getElementById('editor_holder').style = "display: block;"
+        document.getElementById('down').style = "display: inline-block;"
+        document.getElementById('import').style = "display: none;"
+        document.getElementById('file-input').style = "display: none;"
+        document.getElementById('newins').style = "display: none;"
+
+        document.getElementById('hahahad').style = "display: none;"
         var files = document.getElementById('file-input').files;
+
       console.log(files);
       if (files.length <= 0) {
         return false;
       }
 
       var fr = new FileReader();
+        // async function outsetval(formatted){
+        //     outputTextarea.setValue(formatted)
+        //     return;
+        // };
+        const delay = ms => new Promise(res => setTimeout(res, ms));
 
-      fr.onload = function(e) { 
+      fr.onload = async function(e) { 
+        imported = true
         var result = JSON.parse(e.target.result);
         var formatted = JSON.stringify(result, null, 2);
         outputTextarea.setValue(formatted)
         editor.setValue(result)
-        outputTextarea.setValue(formatted)
-        editor.setValue(result)
+        await delay(10000)
+        // await outsetval(formatted)
+        // outputTextarea.setValue(formatted)
+        // editor.setValue(result)
+
+        editor.on('change', function () {
+            json = editor.getValue()
+            outputTextarea.setValue(JSON.stringify(json, null, 2))
+            outputTextarea.clearSelection(1)
+        })
       }
+
 
      document.getElementById('import').style = "display: none;"
 
