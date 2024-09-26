@@ -183,6 +183,7 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
 		this.input_type = this.schema.format /* Restore original format */
 		this.input.setAttribute('data-schemaformat', "markdown")
 		this.input.id = Date.now()
+        // console.log(this.input.id)
         // const mydiv = document.createElement('div')
         // mydiv.id = this.input.id * 2
         // mydiv.style = "display: none;"
@@ -209,6 +210,7 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
                 autoFocus: false
             }
 
+        // console.log(this.input.id)
         this.editormd_instance = new window.editormd(this.input.id, options)
         // this.editormd_instance.setMarkdown("ded")
 
@@ -260,18 +262,23 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
 
     postBuild(){
         // super.postBuild()
-        // this.accbuild("")
+        // console.log(imported)
+        if(!imported)this.accbuild("")
+        // if(!imported)this.accbuild("")
     }
 
     setValue(value, initial, fromTemplate){
+
+        // console.log(value)
+        if(!imported)return
         if(initial == true && imported == true)return
-        // console.log(value, initial, fromTemplate)
         // if(this.alrset == false){
             // this.alrset = true
+        // console.log(value)
         this.accbuild(value)
             // return
         // }
-        if(value == undefined)return
+        // if(value == undefined)return
         // console.log(value)
 
         // super.postBuild()
@@ -485,6 +492,7 @@ class EditormdEditor extends JSONEditor.AbstractEditor {
         var formatted = JSON.stringify(result, null, 2);
         outputTextarea.setValue(formatted)
         editor.setValue(result)
+        imported = false
         await delay(10000)
         // await outsetval(formatted)
         // outputTextarea.setValue(formatted)
